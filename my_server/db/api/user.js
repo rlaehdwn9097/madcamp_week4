@@ -23,16 +23,28 @@ router.post('/', function(req,res){
 });
 
 router.post('/login', async (req, res) => {
-    let user = await User.findOne({ userid: req.body.userid, password: req.body.password });
+    console.log(req.body);
+    const user = await User.findOne({ userid: req.body.userid, password: req.body.password });
     if (!user) return res.status(404).json({ message: 'Users Not Found!' });
     else {
+        try{
+        //비밀번호까지 맞다면 토큰을 생성하기.
+        user.generateToken((err, user) => {
+            if (err) return res.status(500).send(err);
 
-        const id = user.userid;
-        const token = jwt.sign({id}, "jwtSecret",{
-            expiresIn:300,
-        })
+            res.status(200).json({
+                userid: user.userid,
+                token: user.token,
+            }); //리턴 값이 lofinSuccess true와 userid 임
+        });
         
-        return res.status(200).json({ data: user });
+        //return res.status(200).json({ data: user });
+    }catch (error) {
+        res.status(500).json({
+          loginSuccess: false,
+          message: error,
+        });
+      }
     }
 });
 

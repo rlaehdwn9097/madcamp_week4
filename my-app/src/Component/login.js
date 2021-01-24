@@ -5,6 +5,7 @@ import axios from 'axios';
 function Login() {
     const [state, setState] = useState({userid : "",password : ""});
     const [status, setStatus] = useState("loading");
+    const [tokenInfo, setTokenInfo] = useState("Not Yet!");
     
     // componentDidMount, componentDidUpdate와 같은 방식으로
     useEffect(() => {
@@ -18,11 +19,16 @@ function Login() {
         console.log(state.password);
         console.log(state);
         */
-        axios.post("https://88f023fc004c.ngrok.io/mongooseDB/user/login", state)
+        axios.post("https://d9e24dc43bfc.ngrok.io/mongooseDB/user/login", state)
         .then(res => {
-            console.log(res);
+            console.log(res.data.token);
             if(res.status == 200){
                 setStatus("Success!");
+
+                setTokenInfo(res.data.token);
+            }
+            else{
+              setStatus(res.status);
             }
         })
         .catch(err => console.log(err));
@@ -45,6 +51,7 @@ function Login() {
         <button onClick={submitFunc}>
           login
         </button>
+        <p>UserToken : {tokenInfo}</p>
       </div>
     );
   }
